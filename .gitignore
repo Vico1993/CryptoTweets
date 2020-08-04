@@ -1,2 +1,4 @@
 config.json
 docker/mongo/volume
+
+.env

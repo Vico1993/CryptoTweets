@@ -15,7 +15,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017").SetAuth(options.Credential{AuthSource: "admin", Username: "root", Password: "secret"}))
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017").SetAuth(options.Credential{AuthSource: "cryptotweets", Username: "crypto", Password: "secret"}))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,8 +27,6 @@ func main() {
 	defer client.Disconnect(ctx)
 
 	db := client.Database("cryptotweets")
-	// db.CreateCollection("cryptocurrency")
-	db.CreateCollection(ctx, "cryptocurrency")
 
 	for _, crypto := range cryptos {
 		_, err := db.Collection("cryptocurrency").InsertOne(ctx, crypto)
