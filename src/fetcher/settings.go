@@ -12,10 +12,8 @@ type CMCConfig struct {
 
 // getCMCConfig return the configuration in the json file
 func getCMCConfig() (CMCConfig, error) {
-	viper.AddConfigPath("/Users/victor/code/perso/CryptoTweets")
+	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
-
-	// viper.AddConfigPath("$HOME/.cmc")
 
 	// Read Config file
 	err := viper.ReadInConfig()
