@@ -1,16 +1,23 @@
-package main
+package cmc
 
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 )
 
-type cryptocurrency struct {
+// cmcConfig all config needed for interacting with CoinMarket Cap
+type cmcConfig struct {
+	CmcAPI     string `mapstructure:"CMC_API"`
+	CmcBaseURL string `mapstructure:"CMC_BASE_URL"`
+}
+
+// Cryptocurrency format sent from cmc
+type Cryptocurrency struct {
 	ID                int      `json:"id"`
 	Name              string   `json:"name"`
 	Symbol            string   `json:"symbol"`
@@ -26,15 +33,13 @@ type cryptocurrency struct {
 }
 
 type cmcOutput struct {
-	Data []cryptocurrency `json:"data"`
+	Data []Cryptocurrency `json:"data"`
 }
 
-func makeRequest() ([]cryptocurrency, error) {
-	config, err := getCMCConfig()
-	if err != nil {
-		log.Print(err)
-		return nil, err
-	}
+func makeRequest() ([]Cryptocurrency, error) {
+	config := cmcConfig{
+		CmcAPI:     os.Getenv("CMC_API"),
+		CmcBaseURL: os.Getenv("CMC_BASE_URL")}
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", config.CmcBaseURL+"/cryptocurrency/listings/latest", nil)
@@ -57,7 +62,6 @@ func makeRequest() ([]cryptocurrency, error) {
 		log.Print(err)
 		return nil, err
 	}
-	fmt.Println(resp.Status)
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
 	if resp.StatusCode != 200 {
