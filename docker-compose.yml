@@ -1,25 +1,28 @@
-version: '3.1'
+version: '3.5'
 
 services:
-    # database:
-    #     image: mongo
-    #     container_name: database
-    #     environment:
-    #         - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
-    #         - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-    #         - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-    #     volumes:
-    #         - ./docker/mongo/init/:/docker-entrypoint-initdb.d/
-    #         - ./docker/mongo/volume:/data/db
-    #     ports:
-    #         - '27017-27019:27017-27019'
-    #     env_file: ./.env
+    database:
+        image: mongo
+        container_name: database
+        environment:
+            - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+        volumes:
+            - ./docker/mongo/init/:/docker-entrypoint-initdb.d/
+            - ./docker/mongo/volume:/data/db
+        ports:
+            - '27017-27019:27017-27019'
+        env_file: ./.env
 
     fetcher:
         build: "./src/fetcher"
         container_name: fetcher
+        environment:
+            WAIT_HOSTS: database:27017
+            WAIT_HOSTS_TIMEOUT: 60
         volumes:
             - ./src/fetcher:/go/src/app/
         env_file: ./.env
-        # depends_on:
-        #     - database
+        links:
+            - database
