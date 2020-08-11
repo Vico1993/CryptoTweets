@@ -1,17 +1,22 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 
 	"github.com/Vico1993/CryptoTweets/src/cmc"
-	"github.com/Vico1993/CryptoTweets/src/database"
 )
 
 func main() {
-	cryptos, err := cmc.MakeRequest()
+	cryptoService := cmc.NewCryptoService()
+
+	cryptos, err := cryptoService.GetTopCrypto(context.TODO())
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	database.SaveCryptoCurrency(cryptos)
+	for _, crypto := range cryptos {
+		fmt.Println(crypto.Name)
+	}
 }
