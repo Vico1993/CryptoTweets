@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
 // cmcConfig all config needed for interacting with CoinMarket Cap
@@ -36,12 +37,15 @@ type cmcOutput struct {
 	Data []Cryptocurrency `json:"data"`
 }
 
-func makeRequest() ([]Cryptocurrency, error) {
+// MakeRequest will make a cmc request
+func MakeRequest() ([]Cryptocurrency, error) {
 	config := cmcConfig{
 		CmcAPI:     os.Getenv("CMC_API"),
 		CmcBaseURL: os.Getenv("CMC_BASE_URL")}
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
 	req, err := http.NewRequest("GET", config.CmcBaseURL+"/cryptocurrency/listings/latest", nil)
 	if err != nil {
 		log.Print(err)

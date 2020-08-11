@@ -2,15 +2,15 @@ package database
 
 import (
 	"context"
+	"log"
 	"os"
-	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func getMongoClient() (*mongo.Client, error) {
-	return mongo.NewClient(
+	return mongo.Connect(context.TODO(),
 		options.Client().ApplyURI("mongodb://database:27017").SetAuth(
 			options.Credential{
 				AuthSource: os.Getenv("MONGO_INITDB_DATABASE"),
@@ -20,20 +20,17 @@ func getMongoClient() (*mongo.Client, error) {
 }
 
 // getDatabase will return the database object once the mongo connection is done
-func getDatabase() (*mongo.Database, context.Context, error) {
+func getDatabase() (*mongo.Database, error) {
 	client, err := getMongoClient()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	err = client.Ping(context.TODO(), nil)
 
-	err = client.Connect(ctx)
 	if err != nil {
-		return nil, nil, err
+		log.Fatal(err)
 	}
-	defer client.Disconnect(ctx)
 
-	return client.Database(os.Getenv("MONGO_INITDB_DATABASE")), ctx, nil
+	return client.Database(os.Getenv("MONGO_INITDB_DATABASE")), nil
 }
