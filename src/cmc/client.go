@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"time"
 )
 
 // BasicOuput reponse structure from CMC
@@ -34,11 +33,9 @@ func NewClient(httpClient *http.Client) *Client {
 	baseURL, _ := url.Parse(os.Getenv("CMC_BASE_URL"))
 
 	c := &Client{
-		BaseURL: baseURL,
-		apiKey:  os.Getenv("CMC_API"),
-		HTTPClient: &http.Client{
-			Timeout: time.Second * 10,
-		},
+		BaseURL:    baseURL,
+		apiKey:     os.Getenv("CMC_API"),
+		HTTPClient: httpClient,
 	}
 
 	return c
@@ -46,14 +43,9 @@ func NewClient(httpClient *http.Client) *Client {
 
 // NewRequest will build the request to CMC webesite
 func (c *Client) NewRequest(ctx context.Context, method string, urlStr string) (*http.Request, error) {
-	u, err := c.BaseURL.Parse(urlStr)
-	if err != nil {
-		return nil, err
-	}
+	u := fmt.Sprintf("%s%s", c.BaseURL.String(), urlStr)
 
-	fmt.Println(u.String())
-
-	req, err := http.NewRequest(method, u.String(), nil)
+	req, err := http.NewRequest(method, u, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +64,6 @@ func (c *Client) NewRequest(ctx context.Context, method string, urlStr string) (
 
 // CheckResponse check Response status code
 func CheckResponse(r *http.Response) error {
-	fmt.Println(r.StatusCode)
 	if c := r.StatusCode; c >= 200 && c <= 299 {
 		return nil
 	}

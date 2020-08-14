@@ -4,7 +4,12 @@ WORKDIR /go/src/github.com/Vico1993/CryptoTweets/src
 
 COPY . .
 
-RUN GOPROXY="direct" go get -d -v ./...
+RUN go get -u github.com/golang/dep/cmd/dep
+
+# RUN GOPROXY="direct" go get -v -u go.mongodb.org/mongo-driver/mongo
+# RUN GOPROXY="direct" go get -d -v ./...
+RUN dep init
+RUN dep ensure
 RUN go install -v ./...
 
 ## THE LIFE SAVER

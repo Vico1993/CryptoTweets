@@ -17,6 +17,6 @@ func main() {
 	}
 
 	for _, crypto := range cryptos {
-		fmt.Println(crypto.Name)
+		fmt.Println(crypto)
 	}
 }

@@ -20,7 +20,7 @@ services:
         container_name: fetcher
         environment:
             WAIT_HOSTS: database:27017
-            WAIT_HOSTS_TIMEOUT: 60
+            WAIT_HOSTS_TIMEOUT: 75
         volumes:
             - ./src:/go/src/app/
         env_file: ./.env

@@ -3,8 +3,8 @@ package cmc
 import (
 	"context"
 	"net/http"
-	"path"
-	"reflect"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 const (
@@ -32,24 +32,12 @@ type Cryptocurrency struct {
 
 func transform(data []interface{}) []Cryptocurrency {
 	cryptos := make([]Cryptocurrency, len(data))
-	for i := range data {
-		var crypto Cryptocurrency
-		item := reflect.ValueOf(data)
+	for i, row := range data {
+		var crypto *Cryptocurrency
 
-		crypto.ID = item.Field(0).Interface().(int)
-		crypto.Name = item.Field(1).Interface().(string)
-		crypto.Symbol = item.Field(2).Interface().(string)
-		crypto.Slug = item.Field(3).Interface().(string)
-		crypto.CmcRank = item.Field(4).Interface().(float64)
-		crypto.NumMarketPairs = item.Field(5).Interface().(float64)
-		crypto.CirculatingSupply = item.Field(6).Interface().(float64)
-		crypto.TotalSupply = item.Field(7).Interface().(float64)
-		crypto.MaxSupply = item.Field(8).Interface().(float64)
-		crypto.LastUpdated = item.Field(9).Interface().(string)
-		crypto.DateAdded = item.Field(10).Interface().(string)
-		crypto.Tags = item.Field(11).Interface().([]string)
+		mapstructure.Decode(row, &crypto)
 
-		cryptos[i] = crypto
+		cryptos[i] = *crypto
 	}
 
 	return cryptos
@@ -64,7 +52,7 @@ func NewCryptoService() *CryptoService {
 func (s *CryptoService) GetTopCrypto(ctx context.Context) ([]Cryptocurrency, error) {
 	client := NewClient(http.DefaultClient)
 
-	req, err := client.NewRequest(ctx, http.MethodGet, path.Join(client.BaseURL.String(), topCryptoURL))
+	req, err := client.NewRequest(ctx, http.MethodGet, topCryptoURL)
 	if err != nil {
 		return nil, err
 	}
