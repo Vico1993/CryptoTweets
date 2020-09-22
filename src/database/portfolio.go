@@ -27,6 +27,29 @@ func NewPorfolio() (Portfolio, error) {
 	return Portfolio{collection: database.Collection(collectionName)}, err
 }
 
+func (p *Portfolio) all() ([]PortfolioItem, error) {
+	var items []PortfolioItem
+
+	result, err := p.collection.Find(context.TODO(), bson.D{})
+	if err != nil {
+		return []PortfolioItem{}, err
+	}
+
+	for result.Next(context.TODO()) {
+		var item PortfolioItem
+
+		err = result.Decode(&item)
+		if err != nil {
+			return []PortfolioItem{}, err
+		}
+
+		// push data into our result array
+		items = append(items, item)
+	}
+
+	return items, nil
+}
+
 func (p *Portfolio) get(tag string) (PortfolioItem, error) {
 	var item PortfolioItem
 
